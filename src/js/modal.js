@@ -8,9 +8,10 @@ function onGalleryItemClick(e) {
 
   e.preventDefault();
 
-  const instance = basicLightbox.create(`<img src="${e.target.dataset.src}">`);
+  const instance = basicLightbox.create(`<img src="${e.target.dataset.src}">`).show();
 
   instance.show();
 }
 
 export { onGalleryItemClick };
+

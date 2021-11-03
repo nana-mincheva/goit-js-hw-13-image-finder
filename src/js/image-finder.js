@@ -1,8 +1,8 @@
-import imagesTpl from '/templates/template.hbs';
-import ImageApiService from '/js/apiService.js';
-import { onGalleryItemClick } from '/js/modal.js';
-import getRefs from '/js/get-refs.js';
-import pnotify from '/js/pnotify.js';
+import imagesTpl from '../templates/template.hbs';
+import ImageApiService from './apiService';
+import { onGalleryItemClick } from './modal';
+import getRefs from './get-refs';
+import pnotify from './pnotify';
 
 const refs = getRefs();
 const imageApiService = new ImageApiService();
