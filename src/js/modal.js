@@ -5,8 +5,12 @@ function onGalleryItemClick(e) {
   if (e.target.nodeName !== 'IMG') {
     return;
   }
+
   e.preventDefault();
-  const instance = basicLightbox.create(`<img src="${e.target.dataset.src}" alt="" />`);
+
+  const instance = basicLightbox.create(`<img src="${e.target.dataset.src}">`);
+
   instance.show();
 }
+
 export { onGalleryItemClick };
