@@ -1,6 +1,6 @@
 import imagesTpl from '/templates/template.hbs';
 import ImageApiService from '/js/apiService.js';
-import { onGalleryItemClick } from '/js/modal.js';
+import { onGalleryItemClick } from './modal.js';
 import getRefs from '/js/get-refs.js';
 import pnotify from '/js/pnotify.js';
 
