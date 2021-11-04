@@ -1,17 +1,15 @@
 import * as basicLightbox from 'basiclightbox';
 import 'basiclightbox/dist/basicLightbox.min.css';
 
-function onGalleryItemClick(e) {
-  if (e.target.nodeName !== 'IMG') {
+function isOpenModal(event) {
+  if (event.target.nodeName !== 'IMG') {
     return;
   }
+  event.preventDefault();
 
-  e.preventDefault();
-
-  const instance = basicLightbox.create(`<img src="${e.target.dataset.src}">`).show();
-
-  instance.show();
+  const showImage = `<img src=${event.target.dataset.source}>`;
+  const showedImage = basicLightbox.create(showImage);
+  showedImage.show();
 }
 
-export { onGalleryItemClick };
-
+export { isOpenModal };

@@ -1,67 +1,58 @@
-import imagesTpl from '/templates/template.hbs';
-import ImageApiService from '/js/apiService.js';
-import { onGalleryItemClick } from '/js/modal.js';
-import getRefs from '/js/get-refs.js';
-import pnotify from '/js/pnotify.js';
+import '@pnotify/core/dist/PNotify.css';
+import '@pnotify/core/dist/BrightTheme.css';
+import { error } from '@pnotify/core';
+import PixabayApi from './apiService';
+import imagesListTemplate from '../templates/template.hbs';
+import { isOpenModal } from './modal';
+import getRefs from './refs';
 
 const refs = getRefs();
-const imageApiService = new ImageApiService();
+const api = new PixabayApi();
 
-refs.searchForm.addEventListener('submit', onSearch);
-refs.imagesContainer.addEventListener('click', onGalleryItemClick);
+refs.searchForm.addEventListener('submit', searchImages);
+refs.gallery.addEventListener('click', isOpenModal);
 
-function onSearch(e) {
-  e.preventDefault();
-  clearImagesContainer();
+function searchImages(event) {
+  event.preventDefault();
+  api.query = event.currentTarget.elements.query.value;
 
-  imageApiService.query = e.currentTarget.elements.query.value;
-
-  if (imageApiService.query.trim() === '') {
-    return pnotify.noDataEntered();
+  if (api.query === '' || api.query === ' ') {
+    return error({
+      text: 'Please enter a valid search value',
+      delay: 2000,
+      maxTextHeight: 0,
+    });
   }
 
-  imageApiService.resetPage();
-  clearImagesContainer();
-  fetchImages();
+  api.resetPage();
+  clearImage();
+  api.fetchImages().then(hits => {
+    renderImages(hits);
+    api.incrementPage();
+  });
 }
 
-async function fetchImages() {
-  try {
-    const response = await imageApiService.fetchImages();
-    const appendImages = appendImagesMarkup(response);
-    const mistake = searchError(appendImages);
-    return mistake;
-  } catch (error) {
-    console.log(error);
-  }
+function renderImages(hits) {
+  refs.gallery.insertAdjacentHTML('beforeend', imagesListTemplate(hits));
 }
 
-function appendImagesMarkup(images) {
-  refs.imagesContainer.insertAdjacentHTML('beforeend', imagesTpl(images));
+function clearImage() {
+  refs.gallery.innerHTML = '';
 }
 
-function clearImagesContainer() {
-  refs.imagesContainer.innerHTML = '';
-}
-
-function searchError() {
-  if (refs.imagesContainer.children.length === 0) {
-    return pnotify.noMatchesFound();
-  }
-}
-
-const onEntry = entries => {
+const observerHandler = entries => {
   entries.forEach(entry => {
-    if (entry.isIntersecting && imageApiService.query !== '') {
-      imageApiService.fetchImages().then(images => {
-        appendImagesMarkup(images);
-        imageApiService.incrementPage();
+    if (entry.isIntersecting && api.query !== '') {
+      api.fetchImages().then(img => {
+        renderImages(img);
+        api.incrementPage();
       });
     }
   });
 };
 
-const observer = new IntersectionObserver(onEntry, {
+const observer = new IntersectionObserver(observerHandler, {
   rootMargin: '150px',
 });
-observer.observe(refs.watcher);
+
+observer.observe(refs.listObserver);
